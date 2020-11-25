@@ -13,10 +13,11 @@ function FullPageSpinner() {
 const Link = props => <RouterLink {...props} />
 
 function ErrorMessage({ error, ...props }) {
+  const errorMessage = error?.response?.data?.detail
   return (
     <div role="alert" {...props}>
       <span>There was an error: </span>
-      <pre>{error.message}</pre>
+      <pre>{errorMessage || error.message}</pre>
     </div>
   )
 }
@@ -25,7 +26,7 @@ function FullPageErrorFallback({ error }) {
   return (
     <div role="alert">
       <p>Uh oh... There's a problem. Try refreshing the app.</p>
-      <pre>{error.message}</pre>
+      <pre>{error.detail}</pre>
     </div>
   )
 }

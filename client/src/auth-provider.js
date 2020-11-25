@@ -16,7 +16,6 @@ function handleUserResponse({ user }) {
 }
 
 function login({ username, password }) {
-  console.log('auth provider login', username)
   return client('login', { username, password }).then(handleUserResponse)
 }
 

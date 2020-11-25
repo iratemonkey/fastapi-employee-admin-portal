@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Spinner, ErrorMessage } from './components/lib'
-import { Logo } from './components/logo'
 import { useAuth } from './contexts/auth-context'
 import { useAsync } from './hooks/useAsync'
 
@@ -8,11 +7,11 @@ function LoginForm({ onSubmit, submitButton }) {
   const { isLoading, isError, error, run } = useAsync()
   function handleSubmit(event) {
     event.preventDefault()
-    const { username, password } = event.target.elements
+    const { email, password } = event.target.elements
 
     run(
       onSubmit({
-        username: username.value,
+        email: email.value,
         password: password.value,
       }),
     )
@@ -21,8 +20,8 @@ function LoginForm({ onSubmit, submitButton }) {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <label htmlFor="username">Username</label>
-        <input id="username" />
+        <label htmlFor="email">Email</label>
+        <input id="email" />
       </div>
       <div>
         <label htmlFor="password">Password</label>
@@ -58,8 +57,7 @@ function UnauthenticatedApp() {
 
   return (
     <div>
-      <Logo width="80" height="80" />
-      <h1>Bookshelf</h1>
+      <h1>Dunder Mifflin</h1>
       {formState === 'login' ? (
         <div className="formGroup">
           <h2>Login</h2>

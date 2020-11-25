@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     MONGO_DB_NAME: str
     MONGO_DB_URI: str
+    USERS_OPEN_REGISTRATION: bool = True
 
     class Config:
         case_sensitive = True

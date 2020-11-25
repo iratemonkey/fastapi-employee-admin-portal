@@ -14,34 +14,37 @@ function forceLogout() {
 
 const auth = endpointUrl => ({
   login: ({ email, password }) => {
-    return axios
-      .post(endpointUrl(`auth/login`), {
-        email,
-        password,
-      })
-      .then(response => {
-        if (response.status === 200) {
-          handleUserResponse(response.data)
-          return response.data
-        } else {
-          return Promise.reject(response)
-        }
-      })
+    const credentials = new FormData()
+    credentials.append('username', email)
+    credentials.append('password', password)
+
+    return axios.post(endpointUrl(`login`), credentials).then(response => {
+      if (response.status === 200) {
+        handleUserResponse(response.data)
+        return response.data
+      } else {
+        return Promise.reject(response)
+      }
+    })
   },
   register: params => {
     const { email: rawEmail, password, ...signUpParams } = params
     const email = rawEmail.toLowerCase()
 
     return axios
-      .post(endpointUrl(`auth/register`), {
+      .post(endpointUrl(`users/register`), {
         email,
         password,
         attributes: { email, ...signUpParams },
       })
       .then(response => {
-        response.user.password = password
-        response.user.email = email
-        return response
+        return {
+          ...response,
+          user: {
+            password,
+            email,
+          },
+        }
       })
   },
   getToken() {
@@ -52,7 +55,7 @@ const auth = endpointUrl => ({
     return JSON.parse(token)
   },
   isCurrentUser: id =>
-    axios.get(endpointUrl(`auth/me/${id}`)).then(response => {
+    axios.get(endpointUrl(`users/me/${id}`)).then(response => {
       if (response.statusText === 401) {
         forceLogout()
         window.location.assign(window.location)
@@ -67,7 +70,7 @@ const auth = endpointUrl => ({
     }),
   logout: refreshToken => {
     window.localStorage.removeItem(localStorageKey)
-    return axios.post(endpointUrl(`auth/register`), {
+    return axios.post(endpointUrl(`users/register`), {
       refreshToken,
     })
   },

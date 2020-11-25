@@ -23,6 +23,7 @@ function useAsync(initialState) {
     ...defaultInitialState,
     ...initialState,
   })
+
   const [{ status, data, error }, setState] = React.useReducer(
     (s, a) => ({ ...s, ...a }),
     initialStateRef.current,
@@ -34,10 +35,12 @@ function useAsync(initialState) {
     data => safeSetState({ data, status: 'resolved' }),
     [safeSetState],
   )
+
   const setError = React.useCallback(
     error => safeSetState({ error, status: 'rejected' }),
     [safeSetState],
   )
+
   const reset = React.useCallback(() => safeSetState(initialStateRef.current), [
     safeSetState,
   ])
@@ -49,6 +52,7 @@ function useAsync(initialState) {
           `The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?`,
         )
       }
+
       safeSetState({ status: 'pending' })
       return promise.then(
         data => {

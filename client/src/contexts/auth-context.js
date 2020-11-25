@@ -5,7 +5,19 @@ import api from '../api'
 import { useAsync } from '../hooks/useAsync'
 import { FullPageSpinner, FullPageErrorFallback } from '../components/lib'
 
-const { auth } = api
+async function bootstrapAppData() {
+  let user = null
+  const token = await api.auth.getToken()
+  if (token) {
+    const { id } = token
+    const data = await api.user.findById(id)
+    queryCache.setQueryData('list-items', data.listItems, {
+      staleTime: 5000,
+    })
+    user = data.user
+  }
+  return user
+}
 
 const AuthContext = React.createContext()
 AuthContext.displayName = 'AuthContext'
@@ -19,20 +31,27 @@ function AuthProvider(props) {
     isIdle,
     isError,
     isSuccess,
+    run,
     setData,
   } = useAsync()
 
+  React.useEffect(() => {
+    const appDataPromise = bootstrapAppData()
+    run(appDataPromise)
+  }, [run])
+
   const login = React.useCallback(
-    form => auth.login(form).then(user => setData(user)),
+    form => api.auth.login(form).then(user => setData(user)),
     [setData],
   )
 
   const register = React.useCallback(
-    form => auth.register(form).then(user => setData(user)),
+    form => api.auth.register(form).then(user => setData(user)),
     [setData],
   )
+
   const logout = React.useCallback(() => {
-    auth.logout()
+    api.auth.logout()
     queryCache.clear()
     setData(null)
   }, [setData])
