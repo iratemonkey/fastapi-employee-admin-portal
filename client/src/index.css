@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.formGroup {
+  max-width: 450px;
+  border-radius: 3px;
+  padding-bottom: '3.5em';
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2);
+  margin: 20vh auto;
+  padding: 25px;
+}
+
+/* Keyframes */
+@keyframes spin {
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
+#spinner {
+  -webkit-animation: spin 5s infinite; /* Safari 4+ */
+  -moz-animation: spin 5s infinite; /* Fx 5+ */
+  -o-animation: spin 5s infinite; /* Opera 12+ */
+  animation: spin 5s infinite; /* IE 10+, Fx 29+ */
+}

@@ -1,18 +1,8 @@
-/** @jsx jsx */
-import { jsx } from '@emotion/core'
-
-import * as React from 'react'
-import {
-  Input,
-  Button,
-  Spinner,
-  FormGroup,
-  ErrorMessage,
-} from './components/lib'
-import { Modal, ModalContents, ModalOpenButton } from './components/modal'
+import React, { useState } from 'react'
+import { Spinner, ErrorMessage } from './components/lib'
 import { Logo } from './components/logo'
-import { useAuth } from './context/auth-context'
-import { useAsync } from './utils/hooks'
+import { useAuth } from './contexts/auth-context'
+import { useAsync } from './hooks/useAsync'
 
 function LoginForm({ onSubmit, submitButton }) {
   const { isLoading, isError, error, run } = useAsync()
@@ -29,27 +19,15 @@ function LoginForm({ onSubmit, submitButton }) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      css={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'stretch',
-        '> div': {
-          margin: '10px auto',
-          width: '100%',
-          maxWidth: '300px',
-        },
-      }}
-    >
-      <FormGroup>
+    <form onSubmit={handleSubmit}>
+      <div>
         <label htmlFor="username">Username</label>
-        <Input id="username" />
-      </FormGroup>
-      <FormGroup>
+        <input id="username" />
+      </div>
+      <div>
         <label htmlFor="password">Password</label>
-        <Input id="password" type="password" />
-      </FormGroup>
+        <input id="password" type="password" />
+      </div>
       <div>
         {React.cloneElement(
           submitButton,
@@ -57,7 +35,7 @@ function LoginForm({ onSubmit, submitButton }) {
           ...(Array.isArray(submitButton.props.children)
             ? submitButton.props.children
             : [submitButton.props.children]),
-          isLoading ? <Spinner css={{ marginLeft: 5 }} /> : null,
+          isLoading ? <Spinner /> : null,
         )}
       </div>
       {isError ? <ErrorMessage error={error} /> : null}
@@ -66,50 +44,42 @@ function LoginForm({ onSubmit, submitButton }) {
 }
 
 function UnauthenticatedApp() {
+  const [formState, setFormState] = useState('login')
   const { login, register } = useAuth()
+
+  function handleToggleForm(event) {
+    event.preventDefault()
+    if (formState === 'login') {
+      setFormState('register')
+    } else {
+      setFormState('login')
+    }
+  }
+
   return (
-    <div
-      css={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100vh',
-      }}
-    >
+    <div>
       <Logo width="80" height="80" />
       <h1>Bookshelf</h1>
-      <div
-        css={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-          gridGap: '0.75rem',
-        }}
-      >
-        <Modal>
-          <ModalOpenButton>
-            <Button variant="primary">Login</Button>
-          </ModalOpenButton>
-          <ModalContents aria-label="Login form" title="Login">
-            <LoginForm
-              onSubmit={login}
-              submitButton={<Button variant="primary">Login</Button>}
-            />
-          </ModalContents>
-        </Modal>
-        <Modal>
-          <ModalOpenButton>
-            <Button variant="secondary">Register</Button>
-          </ModalOpenButton>
-          <ModalContents aria-label="Registration form" title="Register">
-            <LoginForm
-              onSubmit={register}
-              submitButton={<Button variant="secondary">Register</Button>}
-            />
-          </ModalContents>
-        </Modal>
-      </div>
+      {formState === 'login' ? (
+        <div className="formGroup">
+          <h2>Login</h2>
+          <LoginForm onSubmit={login} submitButton={<button>Login</button>} />
+          <button aria-label={formState} onClick={handleToggleForm}>
+            register
+          </button>
+        </div>
+      ) : (
+        <div className="formGroup">
+          <h2>Register</h2>
+          <LoginForm
+            onSubmit={register}
+            submitButton={<button>Register</button>}
+          />
+          <button aria-label={formState} onClick={handleToggleForm}>
+            login
+          </button>
+        </div>
+      )}
     </div>
   )
 }

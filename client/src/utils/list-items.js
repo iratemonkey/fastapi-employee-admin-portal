@@ -1,6 +1,6 @@
 import { useQuery, useMutation, queryCache } from 'react-query'
 import { setQueryDataForBook } from './books'
-import { useClient } from '../context/auth-context'
+import { useClient } from '../contexts/auth-context'
 
 function useListItem(bookId, options) {
   const listItems = useListItems(options)
