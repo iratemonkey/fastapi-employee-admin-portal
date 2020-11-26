@@ -9,12 +9,13 @@ async function bootstrapAppData() {
   let user = null
   const token = await api.auth.getToken()
   if (token) {
-    const { id } = token
-    const data = await api.user.findById(id)
-    queryCache.setQueryData('list-items', data.listItems, {
+    user = await api.auth.isCurrentUser(token)
+
+    // TODO might not add the user to the cache? Not sure maybe just its
+    // other attributes?
+    queryCache.setQueryData('user', user, {
       staleTime: 5000,
     })
-    user = data.user
   }
   return user
 }

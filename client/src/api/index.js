@@ -1,5 +1,4 @@
 import axios from 'axios'
-import * as Auth from '../auth-provider'
 import auth from './auth'
 import user from './user'
 
@@ -12,9 +11,11 @@ const getJwtToken = async () => {
   let token = null
 
   try {
-    const { tokens } = await Auth.getToken()
+    const jwtToken = window.localStorage.getItem(
+      process.env.REACT_APP_LOCAL_STORAGE_KEY,
+    )
 
-    token = tokens.access.token
+    token = JSON.parse(jwtToken).access_token
   } catch (err) {
     // ignore for now...
   }
