@@ -18,7 +18,7 @@ const auth = endpointUrl => ({
     credentials.append('username', email)
     credentials.append('password', password)
 
-    return axios.post(endpointUrl(`login`), credentials).then(response => {
+    return axios.post(endpointUrl(`auth/login`), credentials).then(response => {
       if (response.status === 200) {
         handleUserResponse(response.data)
         return response.data
@@ -32,12 +32,13 @@ const auth = endpointUrl => ({
     const email = rawEmail.toLowerCase()
 
     return axios
-      .post(endpointUrl(`users/register`), {
+      .post(endpointUrl(`auth/register`), {
         email,
         password,
         attributes: { email, ...signUpParams },
       })
       .then(response => {
+        console.log('response', response)
         return {
           ...response,
           user: {

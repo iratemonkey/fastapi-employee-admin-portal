@@ -12,8 +12,8 @@ code {
     monospace;
 }
 
-.formGroup {
-  max-width: 450px;
+.form-wrapper {
+  max-width: 350px;
   border-radius: 3px;
   padding-bottom: '3.5em';
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2);

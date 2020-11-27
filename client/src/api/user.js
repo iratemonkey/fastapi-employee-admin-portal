@@ -22,7 +22,7 @@ const user = endpointUrl => ({
       })
     }
 
-    return axios.get(endpointUrl('/users')).then(response => response.data)
+    return axios.get(endpointUrl('users')).then(response => response.data)
   },
   findById: id =>
     axios.get(endpointUrl(`users/${id}`)).then(response => response.data),
