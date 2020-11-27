@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional, Union
 
 from pymongo.client_session import ClientSession
+from bson import ObjectId
 
 from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
@@ -8,15 +9,13 @@ from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
 
 
-def clean_data(data: dict) -> dict:
-    new_dict = dict(data)
-
-    return new_dict
-
-
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: ClientSession, *, email: str) -> Optional[User]:
         user = db.get_collection("users").find_one({"email": email})
+        return User.from_mongo(user)
+
+    def get_by_id(self, db: ClientSession, *, id: str) -> Optional[User]:
+        user = db.get_collection("users").find_one({"_id": ObjectId(id)})
         return User.from_mongo(user)
 
     def create(self, db: ClientSession, *, obj_in: UserCreate) -> User:
@@ -25,9 +24,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         del data["password"]
 
         doc_type = self.model.doc_type()
-        _id = db.get_collection(doc_type).insert(data)
-        data["id"] = _id
-        return data
+        id = db.get_collection(doc_type).insert(data)
+
+        new_user = self.get_by_id(db, id=id)
+        return new_user
 
     # def update(
     #     self,

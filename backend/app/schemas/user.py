@@ -6,7 +6,7 @@ from app.models.mongo import MongoModel, OID
 
 # Shared properties
 class UserBase(MongoModel):
-    id: Optional[OID] = Field()
+    id: str
     email: EmailStr = None
     is_active: bool = True
     is_superuser: bool = False
@@ -32,8 +32,7 @@ class UserUpdate(UserBase):
 
 
 class UserInDBBase(UserBase):
-    id: OID = Field()
-    hashed_password: str
+    id: str
 
     class Config:
         odm_mode = True
@@ -46,5 +45,5 @@ class User(UserInDBBase):
 
 # Additional properties stored in DB
 class UserInDB(UserInDBBase):
-    id: OID = Field()
+    id: str
     hashed_password: str

@@ -10,7 +10,7 @@ class User(MongoModel):
     def doc_type(cls):
         return "users"
 
-    id: Optional[OID] = Field()
+    id: str
     email: Optional[EmailStr] = None
     hashed_password: str
     first_name: Optional[str] = None
@@ -22,7 +22,6 @@ class User(MongoModel):
     class Config:
         schema_extra = {
             "example": {
-                "username": "captainamerica",
                 "email": "steve.rogers@avengers.com",
                 "first_name": "steve",
                 "last_name": "rogers",
