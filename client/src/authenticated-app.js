@@ -1,13 +1,18 @@
 import React from 'react'
-import { Switch, Route, Link as RouterLink } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorMessage, FullPageErrorFallback } from './components/lib'
 import { useAuth } from './contexts/auth-context'
-import { ReadingListScreen } from './screens/reading-list'
+
+// Screens
+import EmployeesScreen from './screens/employees/employees'
 import { FinishedScreen } from './screens/finished'
 import { DiscoverBooksScreen } from './screens/discover'
 import { BookScreen } from './screens/book'
 import { NotFoundScreen } from './screens/not-found'
+
+// Components
+import Header from './components/header/header'
 
 function ErrorFallback({ error }) {
   return <ErrorMessage error={error} />
@@ -18,13 +23,7 @@ function AuthenticatedApp() {
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
       <div>
-        {user.username}
-        <button onClick={logout}>Logout</button>
-      </div>
-      <div>
-        <div>
-          <Nav />
-        </div>
+        <Header user={user} logout={logout} />
         <main>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
             <AppRoutes />
@@ -35,35 +34,18 @@ function AuthenticatedApp() {
   )
 }
 
-function NavLink(props) {
-  return <RouterLink {...props} />
-}
-
-function Nav(params) {
-  return (
-    <nav>
-      <ul>
-        <li>
-          <NavLink to="/list">Reading List</NavLink>
-        </li>
-        <li>
-          <NavLink to="/finished">Finished Books</NavLink>
-        </li>
-        <li>
-          <NavLink to="/discover">Discover</NavLink>
-        </li>
-      </ul>
-    </nav>
-  )
-}
-
 function AppRoutes() {
   return (
     <Switch>
-      <Route path="/list" element={<ReadingListScreen />} />
-      <Route path="/finished" element={<FinishedScreen />} />
-      <Route path="/discover" element={<DiscoverBooksScreen />} />
-      <Route path="/book/:bookId" element={<BookScreen />} />
+      <Route path="/employees">
+        <EmployeesScreen />
+      </Route>
+      <Router path="employees/:employeeId">
+        <BookScreen />
+      </Router>
+      <Router path="/users">
+        <FinishedScreen />
+      </Router>
       <Route path="*" element={<NotFoundScreen />} />
     </Switch>
   )

@@ -25,6 +25,7 @@ class MongoModel(BaseModel):
         if not data:
             return data
 
+        id = data.pop("_id", None)
         return cls(**dict(data, id=str(id)))
 
     def mongo(self, **kwargs):

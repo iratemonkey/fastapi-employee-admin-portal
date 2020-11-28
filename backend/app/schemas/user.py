@@ -1,7 +1,7 @@
 from typing import Optional, List
-
+from datetime import datetime
 from pydantic import EmailStr, Field
-from app.models.mongo import MongoModel, OID
+from app.models.mongo import MongoModel
 
 
 # Shared properties
@@ -13,6 +13,8 @@ class UserBase(MongoModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     employee_list: Optional[List[str]] = None
+    created_at: datetime
+    updated_at: datetime
 
 
 # Properties to receive via API on creation

@@ -1,6 +1,7 @@
 from typing import Optional, List
+from datetime import datetime
 from pydantic import EmailStr, Field
-from app.models.mongo import MongoModel, OID
+from app.models.mongo import MongoModel
 
 
 class User(MongoModel):
@@ -18,6 +19,8 @@ class User(MongoModel):
     is_active: Optional[bool] = None
     is_superuser: bool = False
     employee_list: Optional[List[str]] = None
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         schema_extra = {

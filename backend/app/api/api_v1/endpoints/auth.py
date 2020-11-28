@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pymongo.client_session import ClientSession
 
-from app import crud, schemas
+from app import crud, schemas, models
 from app.api import deps
 from app.core import security
 from app.core.config import settings
@@ -80,3 +80,20 @@ def create_user_open(
     }
 
     return response
+
+
+@router.get(
+    "/me",
+    response_model=schemas.User,
+    status_code=status.HTTP_200_OK,
+    summary="Get the current_user",
+)
+async def read_users_me(
+    current_user: models.User = Depends(deps.get_current_active_user),
+):
+    """
+    Get the current user to check for authorization.
+
+    - **Authorization Header**: required
+    """
+    return current_user

@@ -12,39 +12,39 @@ function forceLogout() {
   return {}
 }
 
-const auth = endpointUrl => ({
+const auth = (endpointUrl, entityPath) => ({
   login: ({ email, password }) => {
     const credentials = new FormData()
     credentials.append('username', email)
     credentials.append('password', password)
 
-    return axios.post(endpointUrl(`auth/login`), credentials).then(response => {
-      if (response.status === 200) {
-        handleUserResponse(response.data)
-        return response.data
-      } else {
-        return Promise.reject(response)
-      }
-    })
+    return axios
+      .post(endpointUrl(`${entityPath}/login`), credentials)
+      .then(response => {
+        if (response.status === 200) {
+          handleUserResponse(response.data)
+          return response.data
+        } else {
+          return Promise.reject(response)
+        }
+      })
   },
   register: params => {
     const { email: rawEmail, password, ...signUpParams } = params
     const email = rawEmail.toLowerCase()
 
     return axios
-      .post(endpointUrl(`auth/register`), {
+      .post(endpointUrl(`${entityPath}/register`), {
         email,
         password,
         attributes: { email, ...signUpParams },
       })
       .then(response => {
-        console.log('response', response)
-        return {
-          ...response,
-          user: {
-            password,
-            email,
-          },
+        if (response.status === 200) {
+          handleUserResponse(response.data)
+          return response.data
+        } else {
+          return Promise.reject(response)
         }
       })
   },
@@ -56,7 +56,7 @@ const auth = endpointUrl => ({
     return JSON.parse(token)
   },
   isCurrentUser: () =>
-    axios.get(endpointUrl(`users/me`)).then(response => {
+    axios.get(endpointUrl(`${entityPath}/me`)).then(response => {
       if (response.status === 401) {
         forceLogout()
         window.location.assign(window.location)
@@ -71,15 +71,13 @@ const auth = endpointUrl => ({
     }),
   logout: refreshToken => {
     window.localStorage.removeItem(LOCAL_STORAGE_KEY)
-    return axios.post(endpointUrl(`users/register`), {
-      refreshToken,
-    })
+    return
   },
   forgotPassword: email => {
-    return axios.post(endpointUrl('/auth/forgot-password'), email)
+    return axios.post(endpointUrl(`${entityPath}/forgot-password`), email)
   },
   resetPassword: newPassword =>
-    axios.post(endpointUrl('auth/reset-password'), newPassword),
+    axios.post(endpointUrl(`${entityPath}/reset-password`), newPassword),
 })
 
 export default auth

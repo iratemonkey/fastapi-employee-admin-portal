@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     MONGO_DB_NAME: str
     MONGO_DB_URI: str
     USERS_OPEN_REGISTRATION: bool = True
+    DEFAULT_QUERY_LIMIT: int = 25
+    DEFAULT_QUERY_SORT: str = "created_at"
+    DEFAULT_QUERY_SKIP: int = 0
 
     class Config:
         case_sensitive = True

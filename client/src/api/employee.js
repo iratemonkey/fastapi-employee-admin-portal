@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const user = (endpointUrl, entityPath) => ({
+const employee = (endpointUrl, entityPath) => ({
   find: params => {
     let queryParams = Object.assign({}, params)
     if (params && params.filter) {
@@ -36,8 +36,8 @@ const user = (endpointUrl, entityPath) => ({
       .then(response => response.data),
   delete: id =>
     axios
-      .patch(endpointUrl(`${entityPath}/${id}`), { isActive: false })
+      .patch(endpointUrl(`${entityPath}/${id}`))
       .then(response => response.data),
 })
 
-export default user
+export default employee

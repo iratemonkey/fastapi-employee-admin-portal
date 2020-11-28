@@ -5,10 +5,10 @@ from pydantic import BaseModel
 from bson import ObjectId
 from inspect import getmembers, getmodulename, getmodule
 
-# from sqlalchemy.orm import Session
 from pymongo.client_session import ClientSession
-
 from app.db.base_class import Base
+from app.core.config import settings
+
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -28,15 +28,24 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def get(self, db: ClientSession, id: Any) -> Optional[ModelType]:
         _id = ObjectId(id)
         doc_type = self.model.doc_type()
-        doc = db.get_collection(doc_type).find_one({"_id": _id})
+        collection = db.get_collection(doc_type)
+        doc = collection.find_one({"_id": _id})
         return self.model.from_mongo(doc)
 
     def get_multi(
-        self, db: ClientSession, *, skip: int = 0, limit: int = 10
+        self,
+        db: ClientSession,
+        *,
+        skip: int = settings.DEFAULT_QUERY_SKIP,
+        limit: int = settings.DEFAULT_QUERY_LIMIT,
+        sort: str = settings.DEFAULT_QUERY_SORT,
     ) -> List[ModelType]:
         doc_type = self.model.doc_type()
         docs: List[self.model] = []
-        cursor = db.get_collection(doc_type).find().skip(skip).limit(limit)
+
+        collection = db.get_collection(doc_type)
+        cursor = collection.find().sort(sort).skip(skip).limit(limit)
+
         for item in cursor:
             docs.append(self.model.from_mongo(item))
 
@@ -44,11 +53,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def create(self, db: ClientSession, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in = jsonable_encoder(obj_in)
-
-        db_obj = self.model(**obj_in)  # type: ignore
+        db_obj = self.model(**obj_in)
         doc_type = self.model.doc_type()
 
-        new_doc = db.get_collection(doc_type).insert(db_obj)
+        collection = db.get_collection(doc_type)
+        new_doc = collection.insert(db_obj)
+
         return new_doc
 
     def update(
@@ -56,7 +66,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db: ClientSession,
         *,
         db_obj: ModelType,
-        obj_in: Union[UpdateSchemaType, Dict[str, Any]]
+        obj_in: Union[UpdateSchemaType, Dict[str, Any]],
     ) -> ModelType:
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):

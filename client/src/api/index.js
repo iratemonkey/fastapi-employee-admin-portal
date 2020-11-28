@@ -1,6 +1,7 @@
 import axios from 'axios'
 import auth from './auth'
 import user from './user'
+import employee from './employee'
 
 const endpointUrl = url =>
   [process.env.REACT_APP_API_URL, process.env.REACT_APP_API_VERSION, url].join(
@@ -44,6 +45,7 @@ axios.interceptors.request.use(
 // TODO: Fix linting
 /* eslint-disable-next-line import/no-anonymous-default-export */
 export default {
-  auth: auth(endpointUrl),
-  user: user(endpointUrl),
+  auth: auth(endpointUrl, 'auth'),
+  user: user(endpointUrl, 'users'),
+  employee: employee(endpointUrl, 'employees'),
 }

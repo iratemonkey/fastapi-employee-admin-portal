@@ -1,5 +1,5 @@
 from typing import Any, Dict, Optional, Union
-
+from datetime import datetime
 from pymongo.client_session import ClientSession
 from bson import ObjectId
 
@@ -21,6 +21,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def create(self, db: ClientSession, *, obj_in: UserCreate) -> User:
         data = dict(obj_in)
         data["hashed_password"] = get_password_hash(obj_in.password)
+        data["created_at"] = datetime.now()
         del data["password"]
 
         doc_type = self.model.doc_type()

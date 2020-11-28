@@ -1,14 +1,20 @@
-import { useListItems } from '../utils/list-items'
+import { useListItems } from '../cache/list-item-crud'
 import { BookRow } from './book-row'
 
-function ListItemList({ filterListItems, noListItems, noFilteredListItems }) {
-  const listItems = useListItems()
+function ListItemList({
+  queryKey,
+  filterListItems,
+  noListItems,
+  noFilteredListItems,
+}) {
+  const listItems = useListItems({ queryKey })
 
   const filteredListItems = listItems.filter(filterListItems)
 
   if (!listItems.length) {
     return <div>{noListItems}</div>
   }
+
   if (!filteredListItems.length) {
     return <div>{noFilteredListItems}</div>
   }

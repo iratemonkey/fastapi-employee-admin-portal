@@ -1,6 +1,7 @@
 from typing import Optional
+from datetime import datetime
 from pydantic import EmailStr, Field
-from app.models.mongo import MongoModel, OID
+from app.models.mongo import MongoModel
 from uuid import UUID
 
 
@@ -11,11 +12,13 @@ class Employee(MongoModel):
     def doc_type(cls):
         return "employees"
 
-    id: Optional[OID] = Field()
+    id: str
     employee_id: UUID
     email: EmailStr
     first_name: str
     last_name: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         schema_extra = {
@@ -25,5 +28,7 @@ class Employee(MongoModel):
                 "first_name": "thor",
                 "last_name": "odinson",
                 "is_active": True,
+                "created_at": "2020-11-28 18:59:38.283175",
+                "updated_at": "2020-11-28 18:59:38.283175",
             }
         }

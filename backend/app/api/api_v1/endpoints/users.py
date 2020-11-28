@@ -16,6 +16,7 @@ from fastapi import (
 from app import crud, models, schemas
 from app.core.config import settings
 from app.api import deps
+from .utils import common_parameters
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/login")
@@ -26,14 +27,13 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.User])
 def read_users(
     db: ClientSession = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = 100,
+    commons: dict = Depends(common_parameters),
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
     Retrieve users.
     """
-    users = crud.user.get_multi(db, skip=skip, limit=limit)
+    users = crud.user.get_multi(db, **commons)
     return users
 
 
@@ -57,46 +57,23 @@ def create_user(
     return user
 
 
-@router.get(
-    "/me",
-    response_model=schemas.User,
-    status_code=status.HTTP_200_OK,
-    summary="Get the current_user",
-)
-async def read_users_me(
+@router.get("/{user_id}", response_model=schemas.User)
+def read_user_by_id(
+    user_id: int,
     current_user: models.User = Depends(deps.get_current_active_user),
-):
+    db: ClientSession = Depends(deps.get_db),
+) -> Any:
     """
-    Get the current user to check for authorization.
-
-    - **Authorization Header**: required
+    Get a specific user by id.
     """
-    return current_user
-
-
-# @router.get(
-#     "/{user_id}",
-#     response_model=schemas.User,
-#     status_code=status.HTTP_200_OK,
-#     summary="Get a User by user_id",
-# )
-# async def read_user(
-#     user_id: str = Path(..., title="The ID od the user to get"),
-#     authorization: str = Header(...),
-# ):
-#     """
-#     Get a User by a specific user_id:
-
-#     - **Authorization Header**: required
-#     - **user_id**: path, required in path
-#     """
-#     if authorization:
-#         user = models.User(username="seanbaier", token=TOKEN)
-#         return user
-#     else:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-#         )
+    user = crud.user.get(db, id=user_id)
+    if user == current_user:
+        return user
+    if not crud.user.is_superuser(current_user):
+        raise HTTPException(
+            status_code=400, detail="The user doesn't have enough privileges"
+        )
+    return user
 
 
 # @router.put(

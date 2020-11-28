@@ -1,9 +1,10 @@
 import React from 'react'
 import { ErrorMessage } from './lib'
-import { Form, Button, Col, Spinner } from 'react-bootstrap'
+import { Form, Button, Spinner } from 'react-bootstrap'
 import { useAsync } from '../hooks/useAsync'
 import { Formik } from 'formik'
 import { object, string } from 'yup'
+import { capitalize } from '../utils/string'
 
 const schema = object({
   email: string()
@@ -13,6 +14,27 @@ const schema = object({
     .min(4)
     .required('Please enter a password of at least 4 characters'),
 })
+
+function FormGroup({ touched, values, errors, type, name, onChange }) {
+  return (
+    <Form.Group controlId={`validationFormik${name}`}>
+      <Form.Label>{capitalize(name)}</Form.Label>
+      <Form.Control
+        type={type}
+        name={name}
+        placeholder={name}
+        value={values[name]}
+        onChange={onChange}
+        isValid={touched[name] && !errors[name]}
+        isInvalid={touched[name] && !!errors[name]}
+      />
+      <Form.Control.Feedback type="invalid">
+        {errors[name]}
+      </Form.Control.Feedback>
+      <Form.Control.Feedback>Looks Good!</Form.Control.Feedback>
+    </Form.Group>
+  )
+}
 
 function LoginForm({ onSubmit, handleToggleForm, formState }) {
   const { isLoading, isError, error, run } = useAsync()
@@ -50,37 +72,22 @@ function LoginForm({ onSubmit, handleToggleForm, formState }) {
           errors,
         }) => (
           <Form noValidate onSubmit={handleSubmit}>
-            <Form.Row>
-              <Form.Group as={Col} md="4" controlId="validationFormik01">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="email"
-                  value={values.email}
-                  onChange={handleChange}
-                  isValid={touched.email && !errors.email}
-                  isInvalid={touched.email && !!errors.email}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.email}
-                </Form.Control.Feedback>
-                <Form.Control.Feedback>Looks Good!</Form.Control.Feedback>
-              </Form.Group>
-              <Form.Group as={Col} md="4" controlId="validationFormik02">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="password"
-                  value={values.password}
-                  onChange={handleChange}
-                  isValid={touched.password && !errors.password}
-                  isInvalid={touched.password && !!errors.password}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.password}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Form.Row>
+            <FormGroup
+              values={values}
+              touched={touched}
+              errors={errors}
+              name="email"
+              type="text"
+              onChange={handleChange}
+            />
+            <FormGroup
+              values={values}
+              touched={touched}
+              errors={errors}
+              name="password"
+              type="password"
+              onChange={handleChange}
+            />
             <Button className="mb-2" variant="primary" type="submit" block>
               {formState}{' '}
               {isLoading ? (
