@@ -1,13 +1,8 @@
-/** @jsx jsx */
-import { jsx } from '@emotion/core'
-
-import * as React from 'react'
-import Tooltip from '@reach/tooltip'
+import React from 'react'
 import { FaSearch, FaTimes } from 'react-icons/fa'
-import * as colors from '../styles/colors'
 import { useBookSearch, useRefetchBookSearchQuery } from '../utils/books'
 import { BookRow } from '../components/book-row'
-import { BookListUL, Spinner, Input } from '../components/lib'
+import { Spinner } from '../components/lib'
 import { Profiler } from '../components/profiler'
 
 function DiscoverBooksScreen() {
@@ -30,37 +25,24 @@ function DiscoverBooksScreen() {
     <div>
       <div>
         <form onSubmit={handleSearchClick}>
-          <Input
-            placeholder="Search books..."
-            id="search"
-            type="search"
-            css={{ width: '100%' }}
-          />
-          <Tooltip label="Search Books">
+          <input placeholder="Search books..." id="search" type="search" />
+          <div label="Search Books">
             <label htmlFor="search">
-              <button
-                type="submit"
-                css={{
-                  border: '0',
-                  position: 'relative',
-                  marginLeft: '-35px',
-                  background: 'transparent',
-                }}
-              >
+              <button type="submit">
                 {isLoading ? (
                   <Spinner />
                 ) : isError ? (
-                  <FaTimes aria-label="error" css={{ color: colors.danger }} />
+                  <FaTimes aria-label="error" />
                 ) : (
                   <FaSearch aria-label="search" />
                 )}
               </button>
             </label>
-          </Tooltip>
+          </div>
         </form>
 
         {isError ? (
-          <div css={{ color: colors.danger }}>
+          <div>
             <p>There was an error:</p>
             <pre>{error.message}</pre>
           </div>
@@ -85,22 +67,17 @@ function DiscoverBooksScreen() {
           </div>
         )}
         {books.length ? (
-          <Profiler
-            id="Discover Books Screen Book List"
-            metadata={{ query, bookCount: books.length }}
-          >
-            <BookListUL css={{ marginTop: 20 }}>
-              {books.map(book => (
-                <li key={book.id} aria-label={book.title}>
-                  <BookRow key={book.id} book={book} />
-                </li>
-              ))}
-            </BookListUL>
-          </Profiler>
+          <ul css={{ marginTop: 20 }}>
+            {books.map(book => (
+              <li key={book.id} aria-label={book.title}>
+                <BookRow key={book.id} book={book} />
+              </li>
+            ))}
+          </ul>
         ) : queried ? (
-          <div css={{ marginTop: 20, fontSize: '1.2em', textAlign: 'center' }}>
+          <div>
             {isLoading ? (
-              <div css={{ width: '100%', margin: 'auto' }}>
+              <div>
                 <Spinner />
               </div>
             ) : (

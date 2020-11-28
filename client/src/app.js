@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { useAuth } from './context/auth-context'
+import React from 'react'
+import { useAuth } from './contexts/auth-context'
 import { FullPageSpinner } from './components/lib'
 
 const AuthenticatedApp = React.lazy(() =>
@@ -16,4 +16,4 @@ function App() {
   )
 }
 
-export { App }
+export default App
