@@ -65,7 +65,7 @@ function AuthProvider(props) {
   )
 
   const logout = React.useCallback(() => {
-    api.auth.logout()
+    api('auth').logout()
     queryCache.clear()
     setData(null)
   }, [setData])

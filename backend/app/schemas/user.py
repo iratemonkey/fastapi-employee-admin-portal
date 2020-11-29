@@ -19,7 +19,13 @@ class UserBase(MongoModel):
 
 # Properties to receive via API on creation
 class UserCreate(MongoModel):
+    email: EmailStr = None
     password: str
+    is_active: bool = True
+    is_superuser: bool = False
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    employee_list: Optional[List[str]] = None
 
 
 # Properties to receive via API on update

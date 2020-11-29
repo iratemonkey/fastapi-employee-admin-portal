@@ -13,6 +13,8 @@ import {
 import { FaSearch, FaTimes } from 'react-icons/fa'
 import { useSearch, useRefetchEmployeeSearchQuery } from '../../cache/employees'
 import ListTable from '../../components/tables/table'
+import { Error, FallbackError } from '../../components/errors'
+import { ErrorBoundary } from 'react-error-boundary'
 
 function EmployeesScreen() {
   const [query, setQuery] = React.useState('')
@@ -21,6 +23,7 @@ function EmployeesScreen() {
     'employees',
     query,
   )
+
   const refetchEmployeeSearchQuery = useRefetchEmployeeSearchQuery()
 
   React.useEffect(() => {
@@ -81,18 +84,15 @@ function EmployeesScreen() {
           </Jumbotron>
         </Col>
       </Row>
-      <div>
-        {isError ? (
-          <div>
-            <p>There was an error:</p>
-            <pre>{error.message}</pre>
-          </div>
-        ) : null}
-      </div>
+      {/* <div>{isError ? <Error error={error} /> : null}</div> */}
       <div>
         {giveFeedBack()}
         {employees.length ? (
-          <ListTable data={employees} />
+          <ListTable
+            data={employees}
+            listType="employees"
+            isLoading={isLoading}
+          />
         ) : queried ? (
           <div>
             {isLoading ? (
@@ -108,8 +108,8 @@ function EmployeesScreen() {
               </div>
             ) : (
               <p>
-                Hmmm... I couldn't find any employees with the query "{query}."
-                Please try another.
+                Hmmm... I couldn't find any employees with the query "{query}
+                ." Please try another.
               </p>
             )}
           </div>

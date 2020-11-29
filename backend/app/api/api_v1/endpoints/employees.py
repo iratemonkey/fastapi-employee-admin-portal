@@ -25,8 +25,12 @@ def read_employees(
 
 
 @router.get("/{employee_id}", response_model=schemas.EmployeeOut, status_code=200)
-async def read_employee(employee_id):
-    return "Need to build this out"
+async def read_employee(
+    db: ClientSession = Depends(deps.get_db),
+    employee_id: str = None,
+) -> Any:
+    employee = crud.employee.get(db, employee_id)
+    return employee
 
 
 @router.post("/", response_model=schemas.EmployeeOut)

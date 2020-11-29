@@ -17,10 +17,6 @@ class CRUDEmployee(CRUDBase[Employee, EmployeeCreate, EmployeeUpdate]):
         doc = db.get_collection("employees").find_one({"email": email})
         return Employee.from_mongo(doc)
 
-    def get_by_id(self, db: ClientSession, *, id: str) -> Optional[Employee]:
-        doc = db.get_collection("employees").find_one({"_id": ObjectId(id)})
-        return Employee.from_mongo(doc)
-
     def create(self, db: ClientSession, *, obj_in: EmployeeCreate) -> Employee:
         data = dict(obj_in)
         data["employee_id"] = uuid.uuid4()
@@ -30,7 +26,7 @@ class CRUDEmployee(CRUDBase[Employee, EmployeeCreate, EmployeeUpdate]):
         doc_type = self.model.doc_type()
         id = db.get_collection(doc_type).insert(data)
 
-        new_employee = self.get_by_id(db, id=id)
+        new_employee = self.get(db, id=id)
         return new_employee
 
     # def update(

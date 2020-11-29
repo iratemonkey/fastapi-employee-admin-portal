@@ -25,7 +25,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
-    def get(self, db: ClientSession, id: Any) -> Optional[ModelType]:
+    def get(self, db: ClientSession, id: str) -> Optional[ModelType]:
         _id = ObjectId(id)
         doc_type = self.model.doc_type()
         collection = db.get_collection(doc_type)

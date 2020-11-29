@@ -1,5 +1,5 @@
 import React from 'react'
-import { ErrorMessage } from './lib'
+import { Error, ErrorMessage } from './errors'
 import { Form, Button, Spinner } from 'react-bootstrap'
 import { useAsync } from '../hooks/useAsync'
 import { Formik } from 'formik'
@@ -97,7 +97,7 @@ function LoginForm({ onSubmit, handleToggleForm, formState }) {
           </Form>
         )}
       </Formik>
-      {isError ? <ErrorMessage error={error} /> : null}
+      {isError ? <Error error={error} /> : null}
       <Button onClick={handleToggleForm} variant="outline-secondary" block>
         {formType}
       </Button>

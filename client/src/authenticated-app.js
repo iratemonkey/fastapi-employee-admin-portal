@@ -5,6 +5,7 @@ import { useAuth } from './contexts/auth-context'
 
 // Screens
 import EmployeesScreen from './screens/employees/employees'
+import EmployeeScreen from './screens/employees/employee'
 import ErrorScreen from './screens/errors/error-screen'
 
 // Components
@@ -32,6 +33,9 @@ function AppRoutes() {
     <Switch>
       <Route exact path="/employees">
         <EmployeesScreen />
+      </Route>
+      <Route exact path="/employees/:employeeId">
+        <EmployeeScreen />
       </Route>
       <Route path="*" element={<ErrorScreen />} />
     </Switch>

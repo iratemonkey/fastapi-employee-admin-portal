@@ -1,7 +1,9 @@
 import React from 'react'
 import { Table } from 'react-bootstrap'
+import { capitalize } from '../../utils/string'
+import { Link } from 'react-router-dom'
 
-function ListTable({ data }) {
+function ListTable({ data, listType, isLoading }) {
   return (
     <Table striped bordered hover>
       <thead>
@@ -15,8 +17,16 @@ function ListTable({ data }) {
         {data.map(item => {
           return (
             <tr key={item.id}>
-              <td>{item.first_name}</td>
-              <td>{item.last_name}</td>
+              <td>
+                {isLoading ? (
+                  capitalize(item.first_name)
+                ) : (
+                  <Link to={`${listType}/${item.id}`}>
+                    {capitalize(item.first_name)}
+                  </Link>
+                )}
+              </td>
+              <td>{capitalize(item.last_name)}</td>
               <td>{item.email}</td>
             </tr>
           )

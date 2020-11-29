@@ -11,6 +11,7 @@ class EmployeeBase(MongoModel):
     is_active: Optional[bool] = True
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+    image_url: Optional[str] = None
 
 
 # Properties to receive via API on creation
