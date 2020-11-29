@@ -4,10 +4,10 @@ import { FaRegCalendarAlt } from 'react-icons/fa'
 import { useParams } from 'react-router-dom'
 import { useBook } from '../utils/books'
 import { formatDate } from '../utils/misc'
-import { useListItem, useUpdateListItem } from '../utils/list-items'
+import { useListItem, useUpdateListItem } from '../cache/list-items'
 import { Spinner, ErrorMessage } from '../components/lib'
 import { Rating } from '../components/rating'
-import { StatusButtons } from '../components/status-buttons'
+// import { StatusButtons } from '../components/status-buttons'
 
 function BookScreen() {
   const { bookId } = useParams()
@@ -30,7 +30,7 @@ function BookScreen() {
                 <i>{publisher}</i>
               </div>
             </div>
-            <div>{book.loadingBook ? null : <StatusButtons book={book} />}</div>
+            {/* <div>{book.loadingBook ? null : <StatusButtons book={book} />}</div> */}
           </div>
           <div>
             {listItem?.finishDate ? <Rating listItem={listItem} /> : null}

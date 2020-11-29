@@ -1,14 +1,6 @@
 import React from 'react'
 import { Link as RouterLink } from 'react-router-dom'
-import { FaSpinner } from 'react-icons/fa'
-
-function Spinner() {
-  return <FaSpinner id="spinner" aria-label="loading" />
-}
-
-function FullPageSpinner() {
-  return <div>{Spinner()}</div>
-}
+import { Spinner } from 'react-bootstrap'
 
 const Link = props => <RouterLink {...props} />
 
@@ -22,13 +14,4 @@ function ErrorMessage({ error, ...props }) {
   )
 }
 
-function FullPageErrorFallback({ error }) {
-  return (
-    <div role="alert">
-      <p>Uh oh... There's a problem. Try refreshing the app.</p>
-      <pre>{error.detail}</pre>
-    </div>
-  )
-}
-
-export { FullPageErrorFallback, ErrorMessage, Spinner, FullPageSpinner, Link }
+export { ErrorMessage, Link, Spinner }

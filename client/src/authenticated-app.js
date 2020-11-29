@@ -1,31 +1,24 @@
 import React from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
 import { ErrorBoundary } from 'react-error-boundary'
-import { ErrorMessage, FullPageErrorFallback } from './components/lib'
 import { useAuth } from './contexts/auth-context'
 
 // Screens
 import EmployeesScreen from './screens/employees/employees'
-import { FinishedScreen } from './screens/finished'
-import { DiscoverBooksScreen } from './screens/discover'
-import { BookScreen } from './screens/book'
-import { NotFoundScreen } from './screens/not-found'
+import ErrorScreen from './screens/errors/error-screen'
 
 // Components
+import { FallbackError } from './components/errors'
 import Header from './components/header/header'
-
-function ErrorFallback({ error }) {
-  return <ErrorMessage error={error} />
-}
 
 function AuthenticatedApp() {
   const { user, logout } = useAuth()
   return (
-    <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
+    <ErrorBoundary FallbackComponent={ErrorScreen}>
       <div>
         <Header user={user} logout={logout} />
         <main>
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <ErrorBoundary FallbackComponent={FallbackError}>
             <AppRoutes />
           </ErrorBoundary>
         </main>
@@ -37,16 +30,10 @@ function AuthenticatedApp() {
 function AppRoutes() {
   return (
     <Switch>
-      <Route path="/employees">
+      <Route exact path="/employees">
         <EmployeesScreen />
       </Route>
-      <Router path="employees/:employeeId">
-        <BookScreen />
-      </Router>
-      <Router path="/users">
-        <FinishedScreen />
-      </Router>
-      <Route path="*" element={<NotFoundScreen />} />
+      <Route path="*" element={<ErrorScreen />} />
     </Switch>
   )
 }

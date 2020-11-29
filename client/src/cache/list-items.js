@@ -1,6 +1,6 @@
 import { useQuery, useMutation, queryCache } from 'react-query'
 import { setQueryDataForBook } from '../utils/books'
-import api from '../api'
+import { useApi } from '../contexts/auth-context'
 
 function useListItem(queryKey, id, options) {
   const listItems = useListItems(queryKey, options)
@@ -8,13 +8,13 @@ function useListItem(queryKey, id, options) {
 }
 
 function useListItems({ queryKey, onSuccess, ...options } = {}) {
+  const api = useApi()
   const { data: listItems } = useQuery({
     queryKey: queryKey,
     queryFn: () =>
-      api[queryKey].find().then(data => {
-        console.log('data', data)
-        return data.listItems
-      }),
+      api(queryKey)
+        .find()
+        .then(data => data),
     onSuccess: async listItems => {
       await onSuccess?.(listItems)
       for (const listItem of listItems) {
@@ -24,7 +24,6 @@ function useListItems({ queryKey, onSuccess, ...options } = {}) {
     ...options,
   })
 
-  console.log('listItems', listItems)
   return listItems ?? []
 }
 
@@ -49,6 +48,7 @@ function onUpdateMutation(queryKey, newItem) {
 }
 
 function useUpdateListItem(queryKey, options) {
+  const api = useApi()
   return useMutation(
     updates =>
       api[queryKey].update(updates.id, {
@@ -63,6 +63,7 @@ function useUpdateListItem(queryKey, options) {
 }
 
 function useDeleteListItem(queryKey, options) {
+  const api = useApi()
   return useMutation(({ id }) => api[queryKey].delete(id), {
     onMutate: removedItem => {
       const previousItems = queryCache.getQueryData(queryKey)
@@ -79,6 +80,7 @@ function useDeleteListItem(queryKey, options) {
 }
 
 function useCreateListItem(queryKey, options) {
+  const api = useApi()
   return useMutation(
     ({ id }) => api[queryKey].create(queryKey, { data: { id } }),
     {

@@ -14,12 +14,13 @@ router = APIRouter()
 def read_employees(
     db: ClientSession = Depends(deps.get_db),
     commons: dict = Depends(common_parameters),
+    details: Optional[str] = None,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
     Retrieve Employees.
     """
-    employees = crud.employee.get_multi(db, **commons)
+    employees = crud.employee.get_multi(db, query=details, **commons)
     return employees
 
 
@@ -38,11 +39,11 @@ def create_employee(
     """
     Create new employee.
     """
-    user = crud.employee.get_by_email(db, email=employee_in.email)
-    if user:
+    doc = crud.employee.get_by_email(db, email=employee_in.email)
+    if doc:
         raise HTTPException(
             status_code=400,
-            detail="The user with this username already exists in the system.",
+            detail="The employee with this email already exists in the system.",
         )
     employee = crud.employee.create(db, obj_in=employee_in)
     return employee

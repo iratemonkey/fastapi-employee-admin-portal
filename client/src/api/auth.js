@@ -12,14 +12,14 @@ function forceLogout() {
   return {}
 }
 
-const auth = (endpointUrl, entityPath) => ({
+const auth = (getEndpointUrl, entityPath) => ({
   login: ({ email, password }) => {
     const credentials = new FormData()
     credentials.append('username', email)
     credentials.append('password', password)
 
     return axios
-      .post(endpointUrl(`${entityPath}/login`), credentials)
+      .post(getEndpointUrl(`${entityPath}/login`), credentials)
       .then(response => {
         if (response.status === 200) {
           handleUserResponse(response.data)
@@ -34,7 +34,7 @@ const auth = (endpointUrl, entityPath) => ({
     const email = rawEmail.toLowerCase()
 
     return axios
-      .post(endpointUrl(`${entityPath}/register`), {
+      .post(getEndpointUrl(`${entityPath}/register`), {
         email,
         password,
         attributes: { email, ...signUpParams },
@@ -55,8 +55,8 @@ const auth = (endpointUrl, entityPath) => ({
     // but you're probably not an auth provider so you don't need to worry about it).
     return JSON.parse(token)
   },
-  isCurrentUser: () =>
-    axios.get(endpointUrl(`${entityPath}/me`)).then(response => {
+  isCurrentUser: () => {
+    return axios.get(getEndpointUrl(`${entityPath}/me`)).then(response => {
       if (response.status === 401) {
         forceLogout()
         window.location.assign(window.location)
@@ -68,16 +68,16 @@ const auth = (endpointUrl, entityPath) => ({
       } else {
         return Promise.reject(response.data)
       }
-    }),
-  logout: refreshToken => {
-    window.localStorage.removeItem(LOCAL_STORAGE_KEY)
-    return
+    })
+  },
+  logout: () => {
+    return window.localStorage.removeItem(LOCAL_STORAGE_KEY)
   },
   forgotPassword: email => {
-    return axios.post(endpointUrl(`${entityPath}/forgot-password`), email)
+    return axios.post(getEndpointUrl(`${entityPath}/forgot-password`), email)
   },
   resetPassword: newPassword =>
-    axios.post(endpointUrl(`${entityPath}/reset-password`), newPassword),
+    axios.post(getEndpointUrl(`${entityPath}/reset-password`), newPassword),
 })
 
 export default auth

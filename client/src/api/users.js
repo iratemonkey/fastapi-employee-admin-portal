@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const user = (endpointUrl, entityPath) => ({
+const users = (endpointUrl, entityPath) => ({
   find: params => {
     let queryParams = Object.assign({}, params)
     if (params && params.filter) {
@@ -40,4 +40,4 @@ const user = (endpointUrl, entityPath) => ({
       .then(response => response.data),
 })
 
-export default user
+export default users

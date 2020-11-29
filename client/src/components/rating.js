@@ -1,5 +1,5 @@
 import React from 'react'
-import { useUpdateListItem } from '../utils/list-items'
+import { useUpdateListItem } from '../cache/list-items'
 import { FaStar } from 'react-icons/fa'
 import { ErrorMessage } from '../components/lib'
 

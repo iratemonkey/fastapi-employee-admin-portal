@@ -60,8 +60,8 @@ function useAsync(initialState) {
           return data
         },
         error => {
-          setError(error)
-          return Promise.reject(error)
+          setError(error?.response)
+          return Promise.reject(error?.response?.data)
         },
       )
     },

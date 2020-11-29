@@ -1,93 +1,89 @@
-import { useQuery, useMutation, queryCache } from 'react-query'
-import { setQueryDataForBook } from './books'
-import api from '../api'
+import * as React from 'react'
+import { useQuery, queryCache } from 'react-query'
+import { useApi } from '../contexts/auth-context'
 
-function useEmployee(employeeId, options) {
-  const employees = useEmployees(options)
-  return employees?.find(li => li.employeeId === employeeId) ?? null
+const loadingEmployee = {
+  email: 'Loading...',
+  first_name: 'Loading...',
+  last_name: 'Loading...',
+  employee_id: 'Loading...',
+  is_active: 'Loading...',
+  loadingEmployee: true,
 }
 
-function useEmployees({ onSuccess, ...options } = {}) {
-  const { data: employees } = useQuery({
-    queryKey: 'employees',
-    queryFn: () =>
-      api.employee.find().then(data => {
-        console.log('data', data)
-        return data
-      }),
-    onSuccess: async employees => {
-      await onSuccess?.(employees)
+// TODO come back to this and show a better loading component
+const loadingEmployees = Array.from({ length: 1 }, (v, index) => ({
+  id: `loading-employee-${index}`,
+  ...loadingEmployee,
+}))
+
+const employeeQueryConfig = {
+  staleTime: 1000 * 60 * 60,
+  cacheTime: 1000 * 60 * 60,
+}
+
+const getSearchConfig = (api, endpoint, query) => ({
+  queryKey: ['employeeSearch', { query }],
+  queryFn: () =>
+    api(endpoint)
+      .find(query)
+      .then(data => data),
+  config: {
+    onSuccess(employees) {
       for (const employee of employees) {
-        setQueryDataForBook(employee.first_name)
+        queryCache.setQueryData(
+          ['employees', { employeeId: employee.id }],
+          employee,
+          employeeQueryConfig,
+        )
       }
     },
-    ...options,
+  },
+})
+
+function useSearch(endpoint, query) {
+  const api = useApi()
+  const searchConfig = getSearchConfig(api, endpoint, query)
+
+  const result = useQuery(searchConfig)
+  return { ...result, employees: result.data ?? loadingEmployees }
+}
+
+function useEmployee(employeeId, queryKey) {
+  const api = useApi()
+  const { data } = useQuery({
+    queryKey: ['employees', { employeeId }],
+    queryFn: () =>
+      api(queryKey)
+        .findById(employeeId)
+        .then(data => data),
+    ...employeeQueryConfig,
   })
-  return employees ?? []
+  return data ?? loadingEmployee
 }
 
-const defaultMutationOptions = {
-  onError: (err, variables, recover) =>
-    typeof recover === 'function' ? recover() : null,
-  onSettled: () => queryCache.invalidateQueries('employees'),
-}
-
-function onUpdateMutation(newItem) {
-  const previousItems = queryCache.getQueryData('employees')
-
-  queryCache.setQueryData('employees', old => {
-    return old.map(item => {
-      return item.id === newItem.id ? { ...item, ...newItem } : item
-    })
-  })
-
-  return () => queryCache.setQueryData('employees', previousItems)
-}
-
-function useUpdateEmployee(options) {
-  return useMutation(
-    updates =>
-      api.employee.update(updates.id, {
-        data: updates,
-      }),
-    {
-      onMutate: onUpdateMutation,
-      ...defaultMutationOptions,
-      ...options,
+function useRefetchEmployeeSearchQuery() {
+  const api = useApi()
+  return React.useCallback(
+    async function refetchBookSearchQuery() {
+      queryCache.removeQueries('bookSearch')
+      await queryCache.prefetchQuery(getSearchConfig(api, ''))
     },
+    [api],
   )
 }
 
-function useDeleteEmployee(options) {
-  return useMutation(({ id }) => api.employee.delete(id), {
-    onMutate: removedItem => {
-      const previousItems = queryCache.getQueryData('employees')
-
-      queryCache.setQueryData('employees', old => {
-        return old.filter(item => item.id !== removedItem.id)
-      })
-
-      return () => queryCache.setQueryData('employees', previousItems)
-    },
-    ...defaultMutationOptions,
-    ...options,
+function setQueryDataForEmployee(employee) {
+  queryCache.setQueryData({
+    queryKey: ['employee', { employeeId: employee.id }],
+    queryFn: employee,
+    ...employeeQueryConfig,
   })
-}
-
-function useCreateEmployee(options) {
-  return useMutation(
-    ({ employeeId }) => api.employee('employees', { data: { employeeId } }),
-    {
-      ...defaultMutationOptions,
-      ...options,
-    },
-  )
 }
 
 export {
   useEmployee,
-  useEmployees,
-  useUpdateEmployee,
-  useDeleteEmployee,
-  useCreateEmployee,
+  useSearch,
+  useRefetchEmployeeSearchQuery,
+  setQueryDataForEmployee,
 }

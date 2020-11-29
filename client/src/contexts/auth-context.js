@@ -3,13 +3,19 @@ import * as React from 'react'
 import { queryCache } from 'react-query'
 import api from '../api'
 import { useAsync } from '../hooks/useAsync'
-import { FullPageSpinner, FullPageErrorFallback } from '../components/lib'
+import ErrorScreen from '../screens/errors/error-screen'
+import LoadingScreen from '../screens/loading-screen'
 
 async function bootstrapAppData() {
   let user = null
-  const token = await api.auth.getToken()
+  const token = await api('auth').getToken()
   if (token) {
-    user = await api.auth.isCurrentUser(token)
+    const currentUser = await api('auth', { token }).isCurrentUser()
+
+    user = {
+      ...currentUser,
+      token,
+    }
 
     // TODO might not add the user to the cache? Not sure maybe just its
     // other attributes?
@@ -17,6 +23,7 @@ async function bootstrapAppData() {
       staleTime: 5000,
     })
   }
+
   return user
 }
 
@@ -42,12 +49,18 @@ function AuthProvider(props) {
   }, [run])
 
   const login = React.useCallback(
-    form => api.auth.login(form).then(user => setData(user)),
+    form =>
+      api('auth')
+        .login(form)
+        .then(user => setData(user)),
     [setData],
   )
 
   const register = React.useCallback(
-    form => api.auth.register(form).then(user => setData(user)),
+    form =>
+      api('auth')
+        .register(form)
+        .then(user => setData(user)),
     [setData],
   )
 
@@ -65,11 +78,11 @@ function AuthProvider(props) {
   ])
 
   if (isLoading || isIdle) {
-    return <FullPageSpinner />
+    return <LoadingScreen />
   }
 
   if (isError) {
-    return <FullPageErrorFallback error={error} />
+    return <ErrorScreen error={error} onClose={logout} />
   }
 
   if (isSuccess) {
@@ -87,13 +100,10 @@ function useAuth() {
   return context
 }
 
-function useClient() {
-  // const { user } = useAuth()
-  // const token = user?.token
-  // return React.useCallback(
-  //   (endpoint, config) => auth(endpoint, { ...config, token }),
-  //   [token],
-  // )
+function useApi() {
+  const { user } = useAuth()
+  const token = user?.token?.access_token
+  return React.useCallback(endpoint => api(endpoint, { token }), [token])
 }
 
-export { AuthProvider, useAuth, useClient }
+export { AuthProvider, useAuth, useApi }

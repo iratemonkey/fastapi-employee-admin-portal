@@ -36,6 +36,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self,
         db: ClientSession,
         *,
+        query: Optional[str] = "",
         skip: int = settings.DEFAULT_QUERY_SKIP,
         limit: int = settings.DEFAULT_QUERY_LIMIT,
         sort: str = settings.DEFAULT_QUERY_SORT,
@@ -44,7 +45,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         docs: List[self.model] = []
 
         collection = db.get_collection(doc_type)
-        cursor = collection.find().sort(sort).skip(skip).limit(limit)
+
+        mongo_query = {}
+        if query:
+            mongo_query = {
+                "$or": [
+                    {"first_name": {"$regex": query}},
+                    {"last_name": {"$regex": query}},
+                    {"email": {"$regex": query}},
+                ]
+            }
+        cursor = collection.find(mongo_query).sort(sort).skip(skip).limit(limit)
 
         for item in cursor:
             docs.append(self.model.from_mongo(item))

@@ -1,12 +1,9 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { useListItem } from '../cache/list-items'
-// import { StatusButtons } from './status-buttons'
-import { Rating } from './rating'
+// import { StatusButtons } from '../status-buttons'
 
-function BookRow({ book }) {
+function TableRow({ book }) {
   const { title, author, coverImageUrl } = book
-  const listItem = useListItem(book.id)
 
   const id = `book-row-book-${book.id}`
 
@@ -18,10 +15,6 @@ function BookRow({ book }) {
         </div>
         <div>
           <div>
-            <div>
-              <h2 id={id}>{title}</h2>
-              {listItem?.finishDate ? <Rating listItem={listItem} /> : null}
-            </div>
             <div>
               <div>{author}</div>
               <small>{book.publisher}</small>
@@ -35,4 +28,4 @@ function BookRow({ book }) {
   )
 }
 
-export { BookRow }
+export default TableRow

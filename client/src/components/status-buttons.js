@@ -8,15 +8,15 @@ import {
 import {
   useListItem,
   useUpdateListItem,
-  useRemoveListItem,
+  useDeleteListItem,
   useCreateListItem,
-} from '../utils/list-items'
+} from '../cache/list-items'
 
 function StatusButtons({ book }) {
-  const listItem = useListItem(book.id)
+  const listItem = useListItem('employees', book.id)
 
   const [mutate] = useUpdateListItem({ throwOnError: true })
-  const [handleRemoveClick] = useRemoveListItem({ throwOnError: true })
+  const [handleRemoveClick] = useDeleteListItem({ throwOnError: true })
   const [handleAddClick] = useCreateListItem({ throwOnError: true })
 
   return (

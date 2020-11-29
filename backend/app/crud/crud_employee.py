@@ -1,7 +1,8 @@
 import uuid
+from datetime import datetime
 from typing import Any, Dict, Optional, Union
 from bson.binary import Binary, UUID_SUBTYPE
-
+from bson import ObjectId
 
 from pymongo.client_session import ClientSession
 
@@ -11,25 +12,26 @@ from app.models.employee import Employee
 from app.schemas.employee import EmployeeCreate, EmployeeUpdate
 
 
-def clean_data(data: dict) -> dict:
-    new_dict = dict(data)
-
-    return new_dict
-
-
 class CRUDEmployee(CRUDBase[Employee, EmployeeCreate, EmployeeUpdate]):
     def get_by_email(self, db: ClientSession, *, email: str) -> Optional[Employee]:
-        employee = db.get_collection("employee").find_one({"email": email})
-        return Employee.from_mongo(employee)
+        doc = db.get_collection("employees").find_one({"email": email})
+        return Employee.from_mongo(doc)
+
+    def get_by_id(self, db: ClientSession, *, id: str) -> Optional[Employee]:
+        doc = db.get_collection("employees").find_one({"_id": ObjectId(id)})
+        return Employee.from_mongo(doc)
 
     def create(self, db: ClientSession, *, obj_in: EmployeeCreate) -> Employee:
         data = dict(obj_in)
         data["employee_id"] = uuid.uuid4()
+        data["created_at"] = datetime.now()
+        data["updated_at"] = datetime.now()
 
         doc_type = self.model.doc_type()
-        _id = db.get_collection(doc_type).insert(data)
-        data["id"] = _id
-        return data
+        id = db.get_collection(doc_type).insert(data)
+
+        new_employee = self.get_by_id(db, id=id)
+        return new_employee
 
     # def update(
     #     self,

@@ -11,8 +11,8 @@ from app.schemas.user import UserCreate, UserUpdate
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: ClientSession, *, email: str) -> Optional[User]:
-        user = db.get_collection("users").find_one({"email": email})
-        return User.from_mongo(user)
+        doc = db.get_collection("users").find_one({"email": email})
+        return User.from_mongo(doc)
 
     def get_by_id(self, db: ClientSession, *, id: str) -> Optional[User]:
         user = db.get_collection("users").find_one({"_id": ObjectId(id)})
@@ -22,6 +22,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         data = dict(obj_in)
         data["hashed_password"] = get_password_hash(obj_in.password)
         data["created_at"] = datetime.now()
+        data["updated_at"] = datetime.now()
         del data["password"]
 
         doc_type = self.model.doc_type()
